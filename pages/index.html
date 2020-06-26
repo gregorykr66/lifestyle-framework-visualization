@@ -17,7 +17,7 @@
         ];
 
         //Load data
-        d3.json("/data/mock.json").then(function(data) {
+        d3.json("https://raw.githubusercontent.com/gregorykr66/lifestyle-framework-visualization/master/data/mock.json").then(function(data) {
             console.log(data[0]);
             var simulation = d3.forceSimulation().nodes(data);
 
