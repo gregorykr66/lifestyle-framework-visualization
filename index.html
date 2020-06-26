@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.js"></script>
+</head>
+<body>
+<script>
+        var width = 2000;
+        var height = 1000;
+        var svg = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+        var g = svg.append("g");
+        var links = [
+          {"source": "lifestyle 1", "target": "lifestyle 2"},
+          {"source": "lifestyle 2", "target": "lifestyle 3"}
+        ];
+
+        //Load data
+        d3.json("/data/mock.json").then(function(data) {
+            console.log(data[0]);
+            var simulation = d3.forceSimulation().nodes(data);
+
+            // set up the forces
+            var link = d3.forceLink(links).id(function (d) { return d.name; }).distance(50).strength(1);
+            var charge = d3.forceManyBody().strength(-100);
+            var forceX = d3.forceX().x(width / 2).strength(.05);
+            var forceY = d3.forceY().y(height / 2).strength(.05);
+
+            // apply the forces
+            simulation
+                .force("link", link)
+                .force("charge", charge)
+                .force("forceX", forceX)
+                .force("forceY", forceY)
+                ;
+
+            //add tick instructions:
+            simulation.on("tick", simulation_tick);
+
+            var link = g
+            .selectAll("line")
+            .data(links)
+            .enter()
+            .append("line")
+            .attr("stroke-width", 2)
+            .attr("stroke", "#ddd");
+
+            //group the nodes together for easier ticking
+            var node = g.selectAll("g")
+                .data(data)
+                .enter()
+                .append("g")
+                .attr("class", "node")
+                .call(d3.drag()
+                    .on("start", dragStart)
+                    .on("drag", dragDone)
+                );
+
+            // add the node circle with the specific colors and radius
+            node
+                .append("circle")
+                .attr("r", 5)
+                .attr("fill", "#FC3D21");
+
+            // add the name label
+            node
+                .append("text")
+                .attr("font-family", "Arial")
+                .attr("font-size", "8pt")
+                .attr("dx", "-30")
+                .attr("style", "fill:white;fill-opacity:1;stroke:#444444;stroke-width:.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;")
+                .text(function (d) { return d.name });
+
+            // attach the zoom handler
+            var zoom_handler = d3.zoom()
+                .on("zoom", zoom_actions);
+
+            zoom_handler(svg);
+
+            //Zoom functions
+            function zoom_actions() {
+                g.attr("transform", d3.event.transform)
+            }
+
+            function dragStart(d) {
+                if (!d3.event.active) simulation.alphaTarget(0.3).restart()
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+
+            function dragDone(d) {
+                d.fx = d3.event.x;
+                d.fy = d3.event.y;
+            }
+
+           function simulation_tick() {
+            link
+                .attr("x1", function (d) { return d.source.x; })
+                .attr("y1", function (d) { return d.source.y; })
+                .attr("x2", function (d) { return d.target.x; })
+                .attr("y2", function (d) { return d.target.y; });
+
+            node
+                .attr("transform", function (d) { return "translate(" + d.x + ", " + d.y + ")"; });
+        }
+        });
+</script>
+<div id="first"></div>
+</body>
+</html>

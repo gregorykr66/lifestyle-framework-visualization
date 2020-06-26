@@ -1,0 +1,29 @@
+[{
+    "name": "lifestyle 1",
+    "intensity": 8,
+    "links": [{
+      "name": "lifestyle 2",
+      "polarity": "+"
+    },
+      {
+      "name": "lifestyle 3",
+      "polarity": "-"
+    }
+    ]
+},
+{
+    "name": "lifestyle 2",
+    "intensity": 3,
+    "links": [
+      {
+      "name": "lifestyle 3",
+      "polarity": "+"
+    }
+    ]
+},
+  {
+    "name": "lifestyle 3",
+    "intensity": 3,
+    "links": []
+}
+]
