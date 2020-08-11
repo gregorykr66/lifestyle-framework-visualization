@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.js"></script>
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0">
+    <meta http-equiv="pragma" content="no-cache">
 </head>
 <body>
 <script>
@@ -11,47 +14,69 @@
             .attr("width", width)
             .attr("height", height);
         var g = svg.append("g");
-        var links = [
-          {"source": "lifestyle 1", "target": "lifestyle 2"},
-          {"source": "lifestyle 2", "target": "lifestyle 3"}
-        ];
-
+        var links = []
+        var personality = {name: "jonathan"}
         //Load data
         d3.json("https://raw.githubusercontent.com/gregorykr66/lifestyle-framework-visualization/master/data/mock.json").then(function(data) {
-            console.log(data[0]);
-            var simulation = d3.forceSimulation().nodes(data);
+        //d3.json("mock4.json").then(function(data) {
+            links = data["links"]
+            nodes = data["lifestyles"]
+            
+            nodes.forEach(function(node) {
+                newLink = {
+                    "source": personality.name,
+                    "target": node.name
+                };
+                links.push(newLink);
+            });
+
+            nodes.push(personality)
+            // create simulation
+            var simulation = d3.forceSimulation().nodes(nodes);
 
             // set up the forces
-            var link = d3.forceLink(links).id(function (d) { return d.name; }).distance(50).strength(1);
-            var charge = d3.forceManyBody().strength(-100);
+            var link = d3.forceLink(links).id(function(d) {
+                return d.name;
+            }).iterations(3).distance(200).strength(1);
+
+           // d3.forceLink(links).id(function(d) {
+             //   if(d.name == "jonathan"){
+               //     return d.name;
+               // }
+            //}).distance(10).strength(1);
+
+
+            var charge = d3.forceManyBody().strength(-400);
             var forceX = d3.forceX().x(width / 2).strength(.05);
             var forceY = d3.forceY().y(height / 2).strength(.05);
+            var forceCenter = d3.forceCenter(width / 2, height / 2);
 
             // apply the forces
             simulation
                 .force("link", link)
                 .force("charge", charge)
+                .force("center", forceCenter)
                 .force("forceX", forceX)
-                .force("forceY", forceY)
-                ;
+                .force("forceY", forceY);
 
             //add tick instructions:
             simulation.on("tick", simulation_tick);
 
             var link = g
-            .selectAll("line")
-            .data(links)
-            .enter()
-            .append("line")
-            .attr("stroke-width", 2)
-            .attr("stroke", "#ddd");
+                .selectAll("line")
+                .data(links)
+                .enter()
+                .append("line")
+                .attr("stroke-width", 1)
+                .attr("stroke", "#ddd");
 
             //group the nodes together for easier ticking
             var node = g.selectAll("g")
-                .data(data)
+                .data(nodes)
                 .enter()
                 .append("g")
                 .attr("class", "node")
+                .attr("id", function(d) { return d.name; })
                 .call(d3.drag()
                     .on("start", dragStart)
                     .on("drag", dragDone)
@@ -63,14 +88,27 @@
                 .attr("r", 5)
                 .attr("fill", "#FC3D21");
 
+            // add specific formatting for 'Personality' node
+            var personalityNode = d3.select("#jonathan");
+            console.log(personalityNode);
+
+              personalityNode
+                .append("circle")
+                .attr("r", 15)
+                .attr("fill", "#0af230")
+                ;
+
             // add the name label
             node
                 .append("text")
                 .attr("font-family", "Arial")
                 .attr("font-size", "8pt")
-                .attr("dx", "-30")
+                .attr("dx", "-20")
+                .attr("dy", "30")
                 .attr("style", "fill:white;fill-opacity:1;stroke:#444444;stroke-width:.5px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;")
-                .text(function (d) { return d.name });
+                .text(function(d) {
+                    return d.name;
+                });
 
             // attach the zoom handler
             var zoom_handler = d3.zoom()
@@ -94,16 +132,26 @@
                 d.fy = d3.event.y;
             }
 
-           function simulation_tick() {
-            link
-                .attr("x1", function (d) { return d.source.x; })
-                .attr("y1", function (d) { return d.source.y; })
-                .attr("x2", function (d) { return d.target.x; })
-                .attr("y2", function (d) { return d.target.y; });
+            function simulation_tick() {
+                link
+                    .attr("x1", function(d) {
+                        return d.source.x;
+                    })
+                    .attr("y1", function(d) {
+                        return d.source.y;
+                    })
+                    .attr("x2", function(d) {
+                        return d.target.x;
+                    })
+                    .attr("y2", function(d) {
+                        return d.target.y;
+                    });
 
-            node
-                .attr("transform", function (d) { return "translate(" + d.x + ", " + d.y + ")"; });
-        }
+                node
+                    .attr("transform", function(d) {
+                        return "translate(" + d.x + ", " + d.y + ")";
+                    });
+            }
         });
 </script>
 <div id="first"></div>

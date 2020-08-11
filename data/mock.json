@@ -1,29 +1,42 @@
-[{
-    "name": "lifestyle 1",
-    "intensity": 8,
-    "links": [{
-      "name": "lifestyle 2",
-      "polarity": "+"
-    },
-      {
-      "name": "lifestyle 3",
-      "polarity": "-"
-    }
-    ]
-},
 {
-    "name": "lifestyle 2",
-    "intensity": 3,
-    "links": [
-      {
+  "lifestyles": [
+    {
+      "name": "lifestyle 1",
+      "intensity": 8
+    },
+    {
+      "name": "lifestyle 2",
+      "intensity": 3
+    },
+    {
       "name": "lifestyle 3",
-      "polarity": "+"
+      "intensity": 3
+    },
+    {
+      "name": "lifestyle 4",
+      "intensity": 3
     }
-    ]
-},
-  {
-    "name": "lifestyle 3",
-    "intensity": 3,
-    "links": []
+  ],
+  "links": [
+    {
+      "source": "lifestyle 1",
+      "target": "lifestyle 2",
+      "value": 1
+    },
+    {
+      "source": "lifestyle 2",
+      "target": "lifestyle 3",
+      "value": -3
+    },
+    {
+      "source": "lifestyle 3",
+      "target": "lifestyle 4",
+      "value": -2
+    },
+    {
+      "source": "lifestyle 3",
+      "target": "lifestyle 1",
+      "value": 1
+    }
+  ]
 }
-]
